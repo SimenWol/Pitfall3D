@@ -1,0 +1,52 @@
+#version 310 es
+out mediump vec4 FragColor;
+in mediump vec2 TexCoord;
+in mediump vec3 Normal;
+in mediump vec3 FragPos;
+
+uniform sampler2D ourTexture;
+
+uniform mediump vec3 viewPos;
+struct PointLight {
+    mediump vec3 position; 
+    mediump vec3 color;
+};
+
+#define NR_POINT_LIGHTS 2
+uniform PointLight pointLights[NR_POINT_LIGHTS];
+
+// function prototypes
+mediump vec3 CalcPointLight(PointLight light, mediump vec3 normal, mediump vec3 fragPos, mediump vec3 viewDir);
+
+void main()
+{
+    mediump vec3 norm = normalize(Normal);
+    mediump vec3 viewDir = normalize(viewPos - FragPos);
+
+    mediump vec3 result;
+    for (int i = 0; i < NR_POINT_LIGHTS; i++)
+        result += CalcPointLight(pointLights[i], norm, FragPos, viewDir);
+
+    FragColor = texture2D(ourTexture, TexCoord) * vec4(result, 1.0);
+}
+
+mediump vec3 CalcPointLight(PointLight light, mediump vec3 normal, mediump vec3 fragPos, mediump vec3 viewDir)
+{
+    // ambient
+    mediump float ambientStrength = 0.1;
+    mediump vec3 ambient = ambientStrength * light.color;
+  	
+    // diffuse 
+
+    mediump vec3 lightDir = normalize(light.position - fragPos);
+    mediump float diff = max(dot(normal, lightDir), 0.0);
+    mediump vec3 diffuse = diff * light.color;
+
+	// specular
+	mediump float specularStrength = 0.5;
+	mediump vec3 reflectDir = reflect(-lightDir, normal);
+	mediump float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
+	mediump vec3 specular = specularStrength * spec * light.color;
+
+    return (ambient + diffuse + specular);
+}

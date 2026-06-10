@@ -1,0 +1,21 @@
+#version 310 es
+out mediump vec4 FragColor;
+in mediump vec2 TexCoord;
+in mediump vec3 FragPos;
+
+uniform sampler2D ourTexture;
+uniform sampler2D diffuse;
+
+uniform mediump vec3 lightColor;
+
+void main()
+{
+    // ambient
+    mediump float ambientStrength = 0.1;
+    mediump vec3 ambient = ambientStrength * lightColor;
+
+    mediump vec3 diffuse = lightColor * texture(diffuse, TexCoord).rgb; // lightmap
+
+	mediump vec3 result = (ambient + diffuse);
+    FragColor = texture2D(ourTexture, TexCoord) * vec4(result, 1.0);
+}

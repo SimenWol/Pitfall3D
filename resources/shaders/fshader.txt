@@ -1,0 +1,11 @@
+#version 310 es
+out mediump vec4 FragColor;
+in mediump vec2 TexCoord;
+
+uniform sampler2D ourTexture;
+uniform mediump vec4 Ambient;
+
+void main()
+{
+FragColor = texture2D(ourTexture, TexCoord) * Ambient;
+}

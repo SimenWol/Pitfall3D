@@ -1,0 +1,11 @@
+#version 310 es
+out mediump vec4 FragColor;
+
+in mediump vec3 TexCoords;
+
+uniform samplerCube skybox;
+
+void main()
+{    
+    FragColor = texture(skybox, TexCoords);
+}
